@@ -30,9 +30,9 @@ async def root_health() -> dict[str, str]:
     return {"status": "ok", "service": "quimera-backend"}
 
 
-@app.get("/health/llm/{provider}", response_model=HealthResponse)
-async def llm_health(provider: str) -> HealthResponse:
-    result = await health_check(provider)  # type: ignore[arg-type]
+@app.get("/health/llm/{model:path}", response_model=HealthResponse)
+async def llm_health(model: str, api_key: str | None = None) -> HealthResponse:
+    result = await health_check(model=model, api_key=api_key)
     return HealthResponse(**result)  # type: ignore[arg-type]
 
 
@@ -49,15 +49,17 @@ async def generate_code(req: GenerateRequest) -> GenerateResponse:
     )
     raw = await generate(
         prompt=req.prompt,
-        provider=req.provider,  # type: ignore[arg-type]
+        model=req.model,
         system_prompt=req.system_prompt or system,
+        api_key=req.api_key,
+        api_base=req.api_base,
     )
     # TODO: parsear JSON y mapear a GenerateResponse en el Paso 2
     return GenerateResponse(
         classical_code="",
         quantum_code="",
         architecture_notes=raw,
-        provider_used=req.provider,
+        model_used=req.model,
     )
 
 

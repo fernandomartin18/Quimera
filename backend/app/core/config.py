@@ -2,7 +2,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Configuración centralizada del backend cargada desde variables de entorno."""
+    """Configuración centralizada del backend.
+
+    LiteLLM detecta automáticamente las API keys desde variables de entorno:
+      - OPENAI_API_KEY, GEMINI_API_KEY, ANTHROPIC_API_KEY, etc.
+    Solo necesitas definir en .env la key del proveedor que vayas a usar.
+    """
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -10,12 +15,11 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Gemini
-    gemini_api_key: str = ""
+    # Default model para el pipeline (cualquier string LiteLLM)
+    default_model: str = "gemini/gemini-3.6-flash"
 
     # Ollama / Local
     ollama_base_url: str = "http://localhost:11434"
-    local_model: str = "llama3.2"
 
     # App
     log_level: str = "INFO"

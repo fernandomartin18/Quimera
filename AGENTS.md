@@ -19,13 +19,14 @@ El sistema se divide en los siguientes componentes principales:
 * **Framework Web:** FastAPI / Uvicorn
 * **Orquestación Multiagente / LLM:** LangGraph / CrewAI / LiteLLM
 * **Soporte de Modelos LLM:**
-  * **API Cloud:** Google Gemini API (`GEMINI_API_KEY`)
+  * **API Cloud:** Google Gemini (`GEMINI_API_KEY`), OpenAI (`OPENAI_API_KEY`), Anthropic (`ANTHROPIC_API_KEY`)
   * **Ejecución Local:** Ollama / vLLM (`http://localhost:11434`)
+  * **Cualquier otro proveedor** soportado por LiteLLM (Mistral, Cohere, Bedrock, Together, Groq, etc.)
 * **Frontend:** React, Vite, Tailwind CSS, `@monaco-editor/react`
 
 ## 4. Reglas de Desarrollo y Convenciones
 1. **Aislamiento de RAG:** No implementar bases de datos vectoriales en este repositorio. Toda consulta de contexto debe pasar por el módulo `context_mock`.
-2. **Soporte Dual de LLMs:** Las funciones de inferencia deben aceptar un parámetro explícito para alternar entre el proveedor `gemini` y `local`.
+2. **Soporte Multi-Proveedor de LLMs:** Las funciones de inferencia deben aceptar un parámetro `model` con cualquier string compatible con LiteLLM (ej: `openai/gpt-4o`, `anthropic/claude-sonnet-4-20250514`, `ollama/llama3.2`, `bedrock/anthropic.claude-3-sonnet...`). Cada usuario configura únicamente la API key del proveedor que vaya a utilizar en su archivo `.env`. Los agentes pueden usar modelos distintos según su rol.
 3. **Estructura de Respuesta del Pipeline:** Las salidas del sistema multiagente deben ajustarse al siguiente esquema JSON:
    * `classical_code`: Código ejecutable clásico.
    * `quantum_code`: Código ejecutable cuántico.

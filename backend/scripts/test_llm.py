@@ -1,10 +1,12 @@
-"""Script de prueba para verificar la conectividad con Gemini y Ollama.
+"""Script de prueba para verificar conectividad con cualquier proveedor LiteLLM.
 
 Uso:
     cd backend
     python -m scripts.test_llm
-    python -m scripts.test_llm --provider gemini
-    python -m scripts.test_llm --provider local
+    python -m scripts.test_llm --model openai/gpt-4o
+    python -m scripts.test_llm --model anthropic/claude-sonnet-4-20250514
+    python -m scripts.test_llm --model ollama/llama3.2
+    python -m scripts.test_llm --model gemini/gemini-2.0-flash openai/gpt-4o
 """
 
 import argparse
@@ -14,16 +16,23 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.llm.client import health_check, generate, Provider  # noqa: E402
+from app.llm.client import health_check, generate  # noqa: E402
+
+DEFAULT_MODELS = [
+    "gemini/gemini-2.0-flash",
+    "openai/gpt-4o",
+    "anthropic/claude-sonnet-4-20250514",
+    "ollama/llama3.2",
+]
 
 
-async def test_provider(provider: Provider) -> None:
+async def test_model(model: str) -> None:
     print(f"\n{'='*50}")
-    print(f"  Probando proveedor: {provider.upper()}")
+    print(f"  Probando: {model}")
     print(f"{'='*50}")
 
     print("\n[1/2] Health check...")
-    result = await health_check(provider)
+    result = await health_check(model=model)
     if result["status"] == "ok":
         print(f"  OK  -> {result['response']}")
     else:
@@ -32,27 +41,26 @@ async def test_provider(provider: Provider) -> None:
 
     print("\n[2/2] Generación de prueba...")
     prompt = "Genera una función en Python que calcule el factorial de un número."
-    reply = await generate(prompt=prompt, provider=provider, max_tokens=256)
+    reply = await generate(prompt=prompt, model=model, max_tokens=256)
     print(f"  Prompt: {prompt}")
     print(f"  Respuesta:\n{reply}")
 
 
-async def main(providers: list[Provider] | None = None) -> None:
-    targets = providers or ["gemini", "local"]
-    for p in targets:
-        await test_provider(p)
+async def main(models: list[str] | None = None) -> None:
+    targets = models or DEFAULT_MODELS
+    for m in targets:
+        await test_model(m)
     print(f"\n{'='*50}")
     print("  Pruebas completadas.")
     print(f"{'='*50}")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Test LLM connectivity")
+    parser = argparse.ArgumentParser(description="Test LLM connectivity (any LiteLLM provider)")
     parser.add_argument(
-        "--provider",
-        choices=["gemini", "local"],
-        help="Proveedor a probar (por defecto: ambos)",
+        "--model",
+        nargs="*",
+        help="Modelo(s) a probar en formato LiteLLM (ej: openai/gpt-4o)",
     )
     args = parser.parse_args()
-    targets = [args.provider] if args.provider else None
-    asyncio.run(main(targets))
+    asyncio.run(main(args.model))

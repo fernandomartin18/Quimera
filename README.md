@@ -36,7 +36,7 @@ El proyecto se enmarca como Trabajo Final de Máster (TFM).
 │  └──────────┘  └──────────┘  └──────────┘  └────────┘  │
 │                    Capa de Inferencia                    │
 ├─────────────────────────────────────────────────────────┤
-│  LiteLLM  ←→  Gemini API  |  Ollama / vLLM (local)     │
+│  LiteLLM  ←→  Cualquier proveedor (Gemini, OpenAI, Anthropic, Ollama, etc.) │
 ├─────────────────────────────────────────────────────────┤
 │  RAG Mock (context_mock) ←→ Servicio RAG externo (fut.) │
 └─────────────────────────────────────────────────────────┘
@@ -59,10 +59,10 @@ El proyecto se enmarca como Trabajo Final de Máster (TFM).
 El backend expone una API REST con los siguientes endpoints:
 
 - `GET /health` — Verificación de estado del servicio
-- `GET /health/llm/{provider}` — Verificación de conectividad con el proveedor LLM
+- `GET /health/llm/{model}` — Verificación de conectividad con un modelo
 - `POST /generate` — Generación de código híbrido a partir de un prompt
 
-El módulo de abstracción LLM soporta alternancia dinámica entre **Gemini API** (cloud) y **Ollama** (local) mediante un parámetro explícito en cada llamada.
+El módulo de abstracción LLM soporta **cualquier proveedor** compatible con LiteLLM. Cada agente puede usar un modelo distinto según su rol.
 
 ### Pendiente
 
@@ -77,7 +77,7 @@ El módulo de abstracción LLM soporta alternancia dinámica entre **Gemini API*
 
 - Python 3.11 o superior
 - [Ollama](https://ollama.com/) (opcional, para modelos locales)
-- Google Gemini API key (opcional, para modelos cloud)
+- API key de al menos un proveedor LLM (Gemini, OpenAI, Anthropic, etc.)
 
 ### Installation
 
@@ -95,7 +95,7 @@ pip install -e "backend[dev]"
 
 # Configurar variables de entorno
 cp backend/.env.example backend/.env
-# Editar backend/.env con tu GEMINI_API_KEY
+# Editar backend/.env con las API keys de tus proveedores
 ```
 
 ### Run the backend
@@ -110,13 +110,12 @@ El servidor estará disponible en `http://localhost:8000`. La documentación int
 ### Test LLM connectivity
 
 ```bash
-# Probar Gemini
-python -m scripts.test_llm --provider gemini
+# Probar un modelo específico
+python -m scripts.test_llm --model openai/gpt-4o
+python -m scripts.test_llm --model anthropic/claude-sonnet-4-20250514
+python -m scripts.test_llm --model ollama/llama3.2
 
-# Probar Ollama (local)
-python -m scripts.test_llm --provider local
-
-# Probar ambos
+# Probar todos los configurados por defecto
 python -m scripts.test_llm
 ```
 

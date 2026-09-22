@@ -3,8 +3,9 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.agents.pipeline import MultiAgentPipeline
 from app.core.config import settings
-from app.llm.client import health_check, generate
+from app.llm.client import health_check
 from app.schemas.pipeline import GenerateRequest, GenerateResponse, HealthResponse
 
 logging.basicConfig(level=settings.log_level)
@@ -38,29 +39,15 @@ async def llm_health(model: str, api_key: str | None = None) -> HealthResponse:
 
 @app.post("/generate", response_model=GenerateResponse)
 async def generate_code(req: GenerateRequest) -> GenerateResponse:
-    """Endpoint principal: recibe un prompt y devuelve código híbrido."""
-    system = (
-        "Eres un ingeniero de software experto en sistemas híbridos clásicos-cuánticos. "
-        "Genera código dividiendo la respuesta en tres bloques JSON:\n"
-        '- "classical_code": lógica clásica (Python/C++)\n'
-        '- "quantum_code": circuitos cuánticos (Qiskit/PennyLane)\n'
-        '- "architecture_notes": explicación técnica\n'
-        "Responde SOLO con JSON válido, sin texto adicional."
-    )
-    raw = await generate(
-        prompt=req.prompt,
+    """Endpoint principal: ejecuta el pipeline multiagente y devuelve los módulos híbridos."""
+    pipeline = MultiAgentPipeline(
         model=req.model,
-        system_prompt=req.system_prompt or system,
         api_key=req.api_key,
         api_base=req.api_base,
+        extra_instructions=req.system_prompt,
     )
-    # TODO: parsear JSON y mapear a GenerateResponse en el Paso 2
-    return GenerateResponse(
-        classical_code="",
-        quantum_code="",
-        architecture_notes=raw,
-        model_used=req.model,
-    )
+    result = await pipeline.run(req.prompt)
+    return GenerateResponse(**result.model_dump(), model_used=req.model)
 
 
 def run() -> None:

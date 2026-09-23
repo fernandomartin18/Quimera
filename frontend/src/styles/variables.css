@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Quimera · Design tokens (globales)
+   Temas claro/oscuro mediante [data-theme] en <html>.
+   ========================================================================== */
+
+:root {
+  /* Tipografía */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  /* Radios */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Layout */
+  --header-height: 60px;
+  --content-width: 1180px;
+
+  /* Movimiento */
+  --transition: 160ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   Tema claro (también valores por defecto antes de hidratar)
+   -------------------------------------------------------------------------- */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f4f6f9;
+  --bg-accent: rgba(99, 91, 255, 0.06);
+  --surface: #ffffff;
+  --surface-2: #f1f3f7;
+  --surface-3: #e7eaf0;
+  --border: #e2e6ee;
+  --border-strong: #c9d0dd;
+
+  --text: #10141d;
+  --text-2: #4a5464;
+  --text-3: #727d92;
+
+  --accent: #635bff;
+  --accent-hover: #4f46e5;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgba(99, 91, 255, 0.12);
+
+  --classic: #2563eb;
+  --classic-soft: rgba(37, 99, 235, 0.12);
+  --quantum: #059669;
+  --quantum-soft: rgba(5, 150, 105, 0.12);
+
+  --success: #059669;
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.1);
+
+  --focus-ring: 0 0 0 3px rgba(99, 91, 255, 0.32);
+  --overlay: rgba(16, 20, 28, 0.45);
+  --header-bg: rgba(255, 255, 255, 0.82);
+
+  --shadow-sm: 0 1px 2px rgba(16, 20, 28, 0.06);
+  --shadow-md: 0 4px 16px rgba(16, 20, 28, 0.08);
+  --shadow-lg: 0 16px 40px rgba(16, 20, 28, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   Tema oscuro
+   -------------------------------------------------------------------------- */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0a0c11;
+  --bg-accent: rgba(124, 116, 255, 0.08);
+  --surface: #11141b;
+  --surface-2: #171b24;
+  --surface-3: #1f2430;
+  --border: #262c3a;
+  --border-strong: #3a4356;
+
+  --text: #e7eaf3;
+  --text-2: #a2abbd;
+  --text-3: #77809a;
+
+  --accent: #7c74ff;
+  --accent-hover: #9a94ff;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgba(124, 116, 255, 0.16);
+
+  --classic: #60a5fa;
+  --classic-soft: rgba(96, 165, 250, 0.14);
+  --quantum: #34d399;
+  --quantum-soft: rgba(52, 211, 153, 0.14);
+
+  --success: #34d399;
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+
+  --focus-ring: 0 0 0 3px rgba(124, 116, 255, 0.4);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --header-bg: rgba(10, 12, 17, 0.8);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+}

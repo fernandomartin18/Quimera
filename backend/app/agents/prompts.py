@@ -48,7 +48,7 @@ con esta estructura exacta:
 
 CLASSICAL_PROGRAMMER_SYSTEM_PROMPT = """\
 Eres el Agente Programador Clásico de Quimera, un ingeniero de software senior \
-experto en Python y C++.
+experto en desarrollo de software.
 
 Tu tarea: recibir la especificación de UN módulo clásico (junto con la visión \
 general de la arquitectura híbrida) y generar el código fuente completo de ese módulo.

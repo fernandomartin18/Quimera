@@ -1,0 +1,109 @@
+{
+  "app": {
+    "name": "Quimera",
+    "tagline": "Código híbrido con IA multiagente"
+  },
+  "nav": {
+    "generator": "Generador",
+    "settings": "Ajustes",
+    "openSettings": "Abrir ajustes",
+    "home": "Volver al generador",
+    "cycleTheme": "Cambiar tema (claro / oscuro / automático)"
+  },
+  "language": {
+    "system": "Automático (Sistema)",
+    "es": "Español",
+    "en": "English"
+  },
+  "theme": {
+    "system": "Automático (Sistema)",
+    "light": "Claro",
+    "dark": "Oscuro"
+  },
+  "generator": {
+    "title": "Generador de código híbrido",
+    "subtitle": "Describe el problema en lenguaje natural y el sistema multiagente analizará el requerimiento para generar los módulos clásicos y cuánticos de la solución.",
+    "prompt": {
+      "label": "Descripción del problema",
+      "placeholder": "Ej.: Implementa un solver que combine una heurística clásica de poda con un circuito cuántico de Grover para buscar soluciones en un grafo no dirigido…",
+      "hint": "Cuanta más contexto des (lenguajes, restricciones, algoritmos), mejor será la arquitectura propuesta."
+    },
+    "provider": {
+      "label": "Proveedor de IA",
+      "modelLabel": "Modelo"
+    },
+    "model": {
+      "label": "Modelo",
+      "loading": "Cargando modelos…",
+      "unavailable": "Sin modelos disponibles",
+      "ollamaError": "No se pudo conectar con Ollama (localhost:11434). Comprueba que esté en marcha con «ollama serve».",
+      "retry": "Reintentar"
+    },
+    "actions": {
+      "generate": "Generar código",
+      "generating": "Generando…"
+    },
+    "loading": {
+      "title": "El pipeline multiagente está trabajando…",
+      "description": "El agente arquitecto descompone el problema y los programadores clásico y cuántico generan cada módulo."
+    },
+    "success": "Código generado correctamente.",
+    "results": {
+      "title": "Resultados",
+      "modelUsed": "Modelo",
+      "tabs": {
+        "classical": "Módulos clásicos",
+        "quantum": "Módulos cuánticos",
+        "architecture": "Notas de arquitectura"
+      },
+      "empty": {
+        "title": "Aún no hay resultados",
+        "description": "Introduce una descripción y pulsa «Generar código» para ver aquí los módulos generados."
+      },
+      "noFiles": "El pipeline no generó archivos en esta categoría."
+    },
+    "code": {
+      "files": "Archivos",
+      "copy": "Copiar código",
+      "copied": "Copiado",
+      "copyFailed": "No se pudo copiar al portapapeles.",
+      "selectHint": "Selecciona un archivo de la lista para ver su contenido."
+    },
+    "errors": {
+      "emptyPrompt": "Introduce una descripción antes de generar el código.",
+      "noModel": "Selecciona un proveedor y un modelo antes de generar el código.",
+      "network": "No se pudo conectar con el backend. Comprueba que esté en marcha (uvicorn app.main:app).",
+      "server": "El backend devolvió un error",
+      "timeout": "La solicitud ha superado el tiempo de espera. El modelo puede estar tardando demasiado.",
+      "generic": "Se ha producido un error inesperado al generar el código."
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Preferencias de la aplicación. Los cambios se guardan automáticamente en este navegador.",
+    "comingSoon": "Próximamente",
+    "sections": {
+      "preferences": "Preferencias",
+      "providers": "Proveedores de IA",
+      "profile": "Perfil"
+    },
+    "preferences": {
+      "title": "Preferencias de usuario",
+      "description": "Idioma y tema de la interfaz de Quimera.",
+      "language": {
+        "label": "Idioma",
+        "description": "Idioma de la interfaz. Con «Automático» se detecta el idioma del navegador.",
+        "detected": "En uso ahora: {{value}}"
+      },
+      "theme": {
+        "label": "Tema",
+        "description": "Apariencia clara u oscura. Con «Automático» se respeta la preferencia del sistema.",
+        "detected": "En uso ahora: {{value}}"
+      }
+    },
+    "placeholder": {
+      "title": "Sección no disponible todavía",
+      "description": "Esta sección estará disponible en futuras iteraciones de la plataforma."
+    }
+  }
+}

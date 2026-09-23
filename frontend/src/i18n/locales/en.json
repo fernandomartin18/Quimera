@@ -1,0 +1,109 @@
+{
+  "app": {
+    "name": "Quimera",
+    "tagline": "Hybrid code with multi-agent AI"
+  },
+  "nav": {
+    "generator": "Generator",
+    "settings": "Settings",
+    "openSettings": "Open settings",
+    "home": "Back to the generator",
+    "cycleTheme": "Switch theme (light / dark / system)"
+  },
+  "language": {
+    "system": "Automatic (System)",
+    "es": "Español",
+    "en": "English"
+  },
+  "theme": {
+    "system": "Automatic (System)",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "generator": {
+    "title": "Hybrid code generator",
+    "subtitle": "Describe the problem in natural language and the multi-agent system will analyze the requirement to generate the classical and quantum modules of the solution.",
+    "prompt": {
+      "label": "Problem description",
+      "placeholder": "e.g. Implement a solver that combines a classical branch-and-bound heuristic with a Grover quantum circuit to search for solutions in an undirected graph…",
+      "hint": "The more context you provide (languages, constraints, algorithms), the better the proposed architecture."
+    },
+    "provider": {
+      "label": "AI provider",
+      "modelLabel": "Model"
+    },
+    "model": {
+      "label": "Model",
+      "loading": "Loading models…",
+      "unavailable": "No models available",
+      "ollamaError": "Could not reach Ollama (localhost:11434). Make sure it is running with «ollama serve».",
+      "retry": "Retry"
+    },
+    "actions": {
+      "generate": "Generate code",
+      "generating": "Generating…"
+    },
+    "loading": {
+      "title": "The multi-agent pipeline is working…",
+      "description": "The architect agent breaks down the problem while the classical and quantum programmers generate each module."
+    },
+    "success": "Code generated successfully.",
+    "results": {
+      "title": "Results",
+      "modelUsed": "Model",
+      "tabs": {
+        "classical": "Classical modules",
+        "quantum": "Quantum modules",
+        "architecture": "Architecture notes"
+      },
+      "empty": {
+        "title": "No results yet",
+        "description": "Enter a description and hit “Generate code” to see the generated modules here."
+      },
+      "noFiles": "The pipeline did not generate files in this category."
+    },
+    "code": {
+      "files": "Files",
+      "copy": "Copy code",
+      "copied": "Copied",
+      "copyFailed": "Could not copy to the clipboard.",
+      "selectHint": "Select a file from the list to view its contents."
+    },
+    "errors": {
+      "emptyPrompt": "Enter a description before generating the code.",
+      "noModel": "Select a provider and a model before generating the code.",
+      "network": "Could not reach the backend. Make sure it is running (uvicorn app.main:app).",
+      "server": "The backend returned an error",
+      "timeout": "The request timed out. The model may be taking too long.",
+      "generic": "An unexpected error occurred while generating the code."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Application preferences. Changes are saved automatically in this browser.",
+    "comingSoon": "Coming soon",
+    "sections": {
+      "preferences": "Preferences",
+      "providers": "AI providers",
+      "profile": "Profile"
+    },
+    "preferences": {
+      "title": "User preferences",
+      "description": "Quimera interface language and theme.",
+      "language": {
+        "label": "Language",
+        "description": "Interface language. With “Automatic” the browser language is detected.",
+        "detected": "Currently in use: {{value}}"
+      },
+      "theme": {
+        "label": "Theme",
+        "description": "Light or dark appearance. With “Automatic” the system preference is respected.",
+        "detected": "Currently in use: {{value}}"
+      }
+    },
+    "placeholder": {
+      "title": "Section not available yet",
+      "description": "This section will be available in future iterations of the platform."
+    }
+  }
+}

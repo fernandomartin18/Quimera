@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Quimera — generación automatizada de código híbrido (clásico + cuántico) mediante sistemas multiagente."
+    />
+    <title>Quimera · Generador de código híbrido</title>
+    <script>
+      (function () {
+        var prefs = { theme: 'system', language: 'system' };
+        try {
+          var stored = JSON.parse(localStorage.getItem('quimera.preferences') || '{}');
+          if (stored) prefs = stored;
+        } catch (e) {
+          /* ignore corrupted storage */
+        }
+        var theme =
+          prefs.theme === 'light' || prefs.theme === 'dark'
+            ? prefs.theme
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        var lang = prefs.language;
+        if (lang !== 'es' && lang !== 'en') {
+          lang = (navigator.language || 'en').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
+        }
+        document.documentElement.lang = lang;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

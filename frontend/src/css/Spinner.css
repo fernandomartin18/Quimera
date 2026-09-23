@@ -1,0 +1,32 @@
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-rotate 0.7s linear infinite;
+  color: var(--accent);
+}
+
+.spinner--lg {
+  width: 38px;
+  height: 38px;
+  border-width: 3px;
+  border-color: var(--accent-soft);
+  border-top-color: var(--accent);
+  border-right-color: transparent;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.6s;
+  }
+}

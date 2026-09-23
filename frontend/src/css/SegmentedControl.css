@@ -1,0 +1,69 @@
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.segmented__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    box-shadow var(--transition);
+}
+
+.segmented__option:hover:not(.is-active) {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.segmented__option.is-active {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.segmented__option svg {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.segmented__option.is-active svg {
+  color: var(--accent);
+}
+
+.segmented__badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  line-height: 1.2;
+}
+
+.segmented__option.is-active .segmented__badge {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent);
+}

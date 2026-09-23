@@ -38,46 +38,105 @@ class PipelineError(Exception):
     """Error irrecuperable en la ejecución del pipeline multiagente."""
 
 
-# Errores transitorios del proveedor (5xx, rate limits) que conviene reintentar.
-_TRANSIENT_ERRORS = (RateLimitError, ServiceUnavailableError, TimeoutError)
+_RETRY_DELAY_RE = re.compile(r'"retryDelay":\s*"(\d+(?:\.\d+)?)s"')
+
+
+def _suggested_retry_delay(error: Exception) -> float | None:
+    """Extrae el `retryDelay` (segundos) que Google/LiteLLM sugiere en el error 429."""
+    match = _RETRY_DELAY_RE.search(str(error))
+    return float(match.group(1)) if match else None
+
+
+def _is_daily_quota_exceeded(error: Exception) -> bool:
+    """Detecta si el 429 corresponde a la cuota diaria free-tier del proveedor."""
+    msg = str(error)
+    return "Quota exceeded" in msg or "GenerateRequestsPerDay" in msg
 
 
 async def call_llm_with_retry(
     operation: Callable[[], Awaitable[str]],
     *,
-    retries: int = 5,
+    transient_retries: int = 5,
+    rate_limit_retries: int = 2,
     base_delay: float = 3.0,
+    max_delay: float = 60.0,
 ) -> str:
-    """Ejecuta una llamada al LLM reintentando ante errores transitorios.
+    """Ejecuta una llamada al LLM reintentando ante errores del proveedor.
+
+    Dos estrategias según el tipo de error:
+      - 503 "high demand" / timeouts: backoff exponencial (hasta `transient_retries`).
+      - 429 rate limit / cuota: se respeta el `retryDelay` que sugiere el proveedor
+        (normalmente ~30-50s) y se limita a `rate_limit_retries` intentos, porque
+        reintentar más solo quema tiempo cuando la cuota está agotada.
 
     Args:
         operation: Callable async que invoca al modelo.
-        retries: Número máximo de reintentos adicionales.
+        transient_retries: Reintentos ante 503/timeout.
+        rate_limit_retries: Reintentos ante 429 (cuota/límite de tasa).
         base_delay: Espera inicial en segundos (se duplica en cada reintento).
+        max_delay: Techo superior para la espera entre reintentos.
 
     Returns:
         Respuesta cruda del modelo.
 
     Raises:
-        PipelineError: Si se agotan los reintentos.
-        Exception: La última excepción no transitoria recibida.
+        PipelineError: Si se agotan los reintentos, con un mensaje claro si la
+            causa es la cuota diaria del proveedor.
     """
+    transient_attempt = 0
+    rate_attempt = 0
     last_error: Exception | None = None
-    for attempt in range(retries + 1):
+
+    while True:
         try:
             return await operation()
-        except _TRANSIENT_ERRORS as e:
+        except RateLimitError as e:
             last_error = e
-            if attempt < retries:
-                delay = base_delay * (2**attempt)
-                logger.warning(
-                    "Error transitorio del proveedor (%s), reintento %d/%d en %.1fs",
-                    type(e).__name__,
-                    attempt + 1,
-                    retries,
-                    delay,
-                )
-                await asyncio.sleep(delay)
+            rate_attempt += 1
+            if rate_attempt > rate_limit_retries:
+                break
+            suggested = _suggested_retry_delay(e) or 0.0
+            delay = min(
+                max(base_delay * (2 ** (rate_attempt - 1)), suggested),
+                max(max_delay, suggested),
+            )
+            logger.warning(
+                "Rate limit del proveedor (429), reintento %d/%d esperando %.0fs "
+                "(delay sugerido por el proveedor: %ss)",
+                rate_attempt,
+                rate_limit_retries,
+                delay,
+                suggested or "n/a",
+            )
+            await asyncio.sleep(delay)
+        except (ServiceUnavailableError, TimeoutError) as e:
+            last_error = e
+            transient_attempt += 1
+            if transient_attempt > transient_retries:
+                break
+            suggested = _suggested_retry_delay(e) or 0.0
+            delay = min(
+                max(base_delay * (2 ** (transient_attempt - 1)), suggested),
+                max(max_delay, suggested),
+            )
+            logger.warning(
+                "Error transitorio del proveedor (%s), reintento %d/%d en %.0fs",
+                type(e).__name__,
+                transient_attempt,
+                transient_retries,
+                delay,
+            )
+            await asyncio.sleep(delay)
+
+    if isinstance(last_error, RateLimitError) and _is_daily_quota_exceeded(last_error):
+        raise PipelineError(
+            "Cuota diaria free-tier del proveedor agotada "
+            "(Gemini free-tier: 20 peticiones/día por modelo; cada health check "
+            "y cada agente del pipeline consume 1). Se renueva a medianoche "
+            "(hora pacífica). Alternativas: activar billing en Google AI Studio "
+            "u otra clave en .env (OPENAI_API_KEY / ANTHROPIC_API_KEY) con "
+            f"--model openai/... / --model anthropic/... Detalle: {last_error}"
+        ) from last_error
     raise PipelineError(f"Agotados los reintentos ante error transitorio: {last_error}")
 
 
@@ -174,29 +233,34 @@ class MultiAgentPipeline:
             len(plan.quantum_specs),
         )
 
-        classical_modules: list[CodeModule] = []
-        for spec in plan.classical_specs:
-            logger.info("Generando módulo clásico: %s", spec.filename)
-            classical_modules.append(
-                await self._generate_module(
-                    spec=spec,
-                    plan=plan,
-                    system_prompt=CLASSICAL_PROGRAMMER_SYSTEM_PROMPT,
-                    model=self.classical_model,
-                )
+        # Todos los specs son independientes tras el plan: se ejecutan en paralelo
+        # y gather preserva el orden (clásicos primero, luego cuánticos).
+        classical_tasks = [
+            self._generate_module(
+                spec=spec,
+                plan=plan,
+                system_prompt=CLASSICAL_PROGRAMMER_SYSTEM_PROMPT,
+                model=self.classical_model,
             )
+            for spec in plan.classical_specs
+        ]
+        quantum_tasks = [
+            self._generate_module(
+                spec=spec,
+                plan=plan,
+                system_prompt=QUANTUM_PROGRAMMER_SYSTEM_PROMPT,
+                model=self.quantum_model,
+            )
+            for spec in plan.quantum_specs
+        ]
 
-        quantum_modules: list[CodeModule] = []
-        for spec in plan.quantum_specs:
-            logger.info("Generando módulo cuántico: %s", spec.filename)
-            quantum_modules.append(
-                await self._generate_module(
-                    spec=spec,
-                    plan=plan,
-                    system_prompt=QUANTUM_PROGRAMMER_SYSTEM_PROMPT,
-                    model=self.quantum_model,
-                )
-            )
+        logger.info(
+            "Lanzando %d subagentes programadores en paralelo",
+            len(classical_tasks) + len(quantum_tasks),
+        )
+        results = await asyncio.gather(*classical_tasks, *quantum_tasks)
+        classical_modules = list(results[: len(classical_tasks)])
+        quantum_modules = list(results[len(classical_tasks) :])
 
         if not classical_modules and not quantum_modules:
             raise PipelineError("El Arquitecto no produjo ninguna especificación de módulo")
@@ -249,6 +313,7 @@ class MultiAgentPipeline:
         contenido del módulo con filename/description de la especificación
         (fallback para que un solo módulo malformado no tumbe todo el pipeline).
         """
+        logger.info("Generando módulo: %s", spec.filename)
         user_prompt = (
             "Visión general de la arquitectura híbrida:\n"
             f"{plan.architecture_overview}\n\n"

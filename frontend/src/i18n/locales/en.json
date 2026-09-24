@@ -93,7 +93,21 @@
       "network": "Could not reach the backend. Make sure it is running (uvicorn app.main:app).",
       "server": "The backend returned an error",
       "timeout": "The request timed out. The model may be taking too long.",
-      "generic": "An unexpected error occurred while generating the code."
+      "generic": "An unexpected error occurred while generating the code.",
+      "codes": {
+        "quota_exhausted": "The AI daily quota is exhausted. Try again tomorrow or configure another API key in the backend.",
+        "retries_exhausted": "The AI provider is not responding right now. Please try again in a few minutes.",
+        "invalid_json": "The model returned a response that could not be interpreted. Please try again.",
+        "invalid_plan": "Your description could not be analyzed. Review the text and try again.",
+        "no_specs": "No modules were generated from your description. Add more details and try again.",
+        "empty_prompt": "Enter a description before generating the code.",
+        "auth_error": "The API key for this provider is missing or invalid. Configure it in the backend .env file.",
+        "model_not_found": "The selected model does not exist or is not available on this provider.",
+        "context_window": "The content exceeds the model's context limit. Shorten the description or use a model with a larger context window.",
+        "bad_request": "The provider rejected the request. Try another model or review the description.",
+        "provider_error": "The AI provider returned an error. Try again or use another model.",
+        "unexpected": "An unexpected backend error occurred. Check its logs for details."
+      }
     }
   },
   "settings": {

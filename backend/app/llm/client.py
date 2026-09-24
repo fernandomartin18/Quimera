@@ -65,7 +65,7 @@ async def health_check(
     """Verifica que el modelo/proveedor esté accesible."""
     try:
         reply = await generate(
-            prompt="Responde unicamente: OK",
+            prompt="Respond with only: OK",
             model=model,
             max_tokens=8,
             api_key=api_key,

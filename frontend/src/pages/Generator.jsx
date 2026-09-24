@@ -15,9 +15,13 @@ function buildErrorMessage(error, t) {
     if (error.code === 'network') return t('generator.errors.network')
     if (error.code === 'timeout') return t('generator.errors.timeout')
     if (error.code === 'http') {
-      return error.detail
-        ? `${t('generator.errors.server')}: ${error.detail}`
-        : `${t('generator.errors.server')} (${error.status})`
+      if (error.serverCode) {
+        const friendly = t(`generator.errors.codes.${error.serverCode}`, {
+          defaultValue: '',
+        })
+        if (friendly) return friendly
+      }
+      return `${t('generator.errors.server')} (${error.status})`
     }
   }
   return t('generator.errors.generic')
@@ -93,6 +97,7 @@ export default function Generator() {
       setResult(data)
       toast.success(t('generator.success'))
     } catch (error) {
+      console.error('[generate-code]', error)
       toast.error(buildErrorMessage(error, t))
     } finally {
       setLoading(false)

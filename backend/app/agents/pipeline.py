@@ -17,7 +17,15 @@ import re
 from collections.abc import Awaitable, Callable
 from typing import Any
 
-from litellm import RateLimitError, ServiceUnavailableError
+from litellm import (
+    APIError,
+    AuthenticationError,
+    BadRequestError,
+    ContextWindowExceededError,
+    NotFoundError,
+    RateLimitError,
+    ServiceUnavailableError,
+)
 from pydantic import ValidationError
 
 from app.agents.prompts import (
@@ -35,7 +43,16 @@ _FENCE_RE = re.compile(r"```(?:json|python|cpp)?\s*(.*?)```", re.DOTALL)
 
 
 class PipelineError(Exception):
-    """Error irrecuperable en la ejecución del pipeline multiagente."""
+    """Error irrecuperable en la ejecución del pipeline multiagente.
+
+    Attributes:
+        message: Descripción técnica del error (para logs).
+        code: Código estable que el frontend traduce a un mensaje amigable.
+    """
+
+    def __init__(self, message: str, *, code: str = "pipeline") -> None:
+        super().__init__(message)
+        self.code = code
 
 
 _RETRY_DELAY_RE = re.compile(r'"retryDelay":\s*"(\d+(?:\.\d+)?)s"')
@@ -51,6 +68,33 @@ def _is_daily_quota_exceeded(error: Exception) -> bool:
     """Detecta si el 429 corresponde a la cuota diaria free-tier del proveedor."""
     msg = str(error)
     return "Quota exceeded" in msg or "GenerateRequestsPerDay" in msg
+
+
+_MISSING_CREDENTIALS_RE = re.compile(
+    r"missing credentials|api[_ ]key.{0,40}(is not set|must be set|not found|invalid)"
+    r"|no auth credentials|unauthorized|invalid api key",
+    re.IGNORECASE,
+)
+
+
+def as_pipeline_error(error: Exception) -> PipelineError:
+    """Convierte un error de proveedor/LiteLLM en un `PipelineError` con un
+    `code` que el frontend traduce a un mensaje amigable."""
+    message = str(error)
+    if isinstance(error, AuthenticationError) or _MISSING_CREDENTIALS_RE.search(message):
+        return PipelineError(
+            f"Provider authentication failed (missing or invalid API key): {error}",
+            code="auth_error",
+        )
+    if isinstance(error, NotFoundError):
+        return PipelineError(f"Model not found on the provider: {error}", code="model_not_found")
+    if isinstance(error, ContextWindowExceededError):
+        return PipelineError(f"Context window exceeded: {error}", code="context_window")
+    if isinstance(error, BadRequestError):
+        return PipelineError(f"Provider rejected the request: {error}", code="bad_request")
+    if isinstance(error, APIError):
+        return PipelineError(f"Provider error: {error}", code="provider_error")
+    return PipelineError(f"Unexpected error calling the provider: {error}", code="unexpected")
 
 
 async def call_llm_with_retry(
@@ -127,17 +171,26 @@ async def call_llm_with_retry(
                 delay,
             )
             await asyncio.sleep(delay)
+        except Exception as e:
+            # Errores no retransmisibles (auth, modelo inexistente, petición
+            # inválida, error del proveedor...): se mapean a un código amigable
+            # para que el frontend muestre un mensaje corto en su toast.
+            raise as_pipeline_error(e) from e
 
     if isinstance(last_error, RateLimitError) and _is_daily_quota_exceeded(last_error):
         raise PipelineError(
-            "Cuota diaria free-tier del proveedor agotada "
-            "(Gemini free-tier: 20 peticiones/día por modelo; cada health check "
-            "y cada agente del pipeline consume 1). Se renueva a medianoche "
-            "(hora pacífica). Alternativas: activar billing en Google AI Studio "
-            "u otra clave en .env (OPENAI_API_KEY / ANTHROPIC_API_KEY) con "
-            f"--model openai/... / --model anthropic/... Detalle: {last_error}"
+            "Provider daily free-tier quota exhausted "
+            "(Gemini free-tier: 20 requests/day per model; every health check "
+            "and every pipeline agent consumes 1). It renews at midnight "
+            "(Pacific time). Alternatives: enable billing in Google AI Studio "
+            "or use another key in .env (OPENAI_API_KEY / ANTHROPIC_API_KEY) with "
+            f"--model openai/... / --model anthropic/... Detail: {last_error}",
+            code="quota_exhausted",
         ) from last_error
-    raise PipelineError(f"Agotados los reintentos ante error transitorio: {last_error}")
+    raise PipelineError(
+        f"Retries exhausted after a transient provider error: {last_error}",
+        code="retries_exhausted",
+    )
 
 
 def extract_json(text: str) -> dict[str, Any]:
@@ -162,13 +215,19 @@ def extract_json(text: str) -> dict[str, Any]:
     start = cleaned.find("{")
     end = cleaned.rfind("}")
     if start == -1 or end == -1 or end < start:
-        raise PipelineError(f"No se encontró un objeto JSON en la respuesta: {text[:200]!r}")
+        raise PipelineError(
+            f"No JSON object found in the model response: {text[:200]!r}",
+            code="invalid_json",
+        )
     try:
         data = json.loads(cleaned[start : end + 1])
     except json.JSONDecodeError as e:
-        raise PipelineError(f"JSON inválido en la respuesta del modelo: {e}") from e
+        raise PipelineError(f"Invalid JSON in the model response: {e}", code="invalid_json") from e
     if not isinstance(data, dict):
-        raise PipelineError("Se esperaba un objeto JSON, se obtuvo otro tipo de dato")
+        raise PipelineError(
+            "Expected a JSON object, got a different data type",
+            code="invalid_json",
+        )
     return data
 
 
@@ -223,7 +282,7 @@ class MultiAgentPipeline:
             PipelineError: Si un agente falla o el plan no contiene módulos.
         """
         if not prompt.strip():
-            raise PipelineError("El prompt no puede estar vacío")
+            raise PipelineError("The prompt cannot be empty", code="empty_prompt")
 
         logger.info("Pipeline iniciado (model=%s)", self.model)
         plan = await self._analyze(prompt)
@@ -263,7 +322,10 @@ class MultiAgentPipeline:
         quantum_modules = list(results[len(classical_tasks) :])
 
         if not classical_modules and not quantum_modules:
-            raise PipelineError("El Arquitecto no produjo ninguna especificación de módulo")
+            raise PipelineError(
+                "The Architect did not produce any module specification",
+                code="no_specs",
+            )
 
         result = PipelineResult(
             classical_modules=classical_modules,
@@ -279,9 +341,9 @@ class MultiAgentPipeline:
 
     async def _analyze(self, prompt: str) -> ArchitectPlan:
         """Ejecuta el Agente Arquitecto/Analista y valida su plan."""
-        user_prompt = f"Descripción del problema:\n\n{prompt}"
+        user_prompt = f"Problem description:\n\n{prompt}"
         if self.extra_instructions:
-            user_prompt += f"\n\nInstrucciones adicionales:\n{self.extra_instructions}"
+            user_prompt += f"\n\nAdditional instructions:\n{self.extra_instructions}"
 
         raw = await call_llm_with_retry(
             lambda: generate(
@@ -297,7 +359,7 @@ class MultiAgentPipeline:
         try:
             plan = ArchitectPlan.model_validate(extract_json(raw))
         except ValidationError as e:
-            raise PipelineError(f"Plan del Arquitecto inválido: {e}") from e
+            raise PipelineError(f"Invalid Architect plan: {e}", code="invalid_plan") from e
         return plan
 
     async def _generate_module(
@@ -315,9 +377,9 @@ class MultiAgentPipeline:
         """
         logger.info("Generando módulo: %s", spec.filename)
         user_prompt = (
-            "Visión general de la arquitectura híbrida:\n"
+            "Overall hybrid architecture:\n"
             f"{plan.architecture_overview}\n\n"
-            "Especificación del módulo a generar:\n"
+            "Module specification to generate:\n"
             f"{spec.model_dump_json(indent=2)}"
         )
         raw = await call_llm_with_retry(

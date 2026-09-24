@@ -93,7 +93,21 @@
       "network": "No se pudo conectar con el backend. Comprueba que esté en marcha (uvicorn app.main:app).",
       "server": "El backend devolvió un error",
       "timeout": "La solicitud ha superado el tiempo de espera. El modelo puede estar tardando demasiado.",
-      "generic": "Se ha producido un error inesperado al generar el código."
+      "generic": "Se ha producido un error inesperado al generar el código.",
+      "codes": {
+        "quota_exhausted": "Se ha agotado la cuota diaria de la IA. Inténtalo de nuevo mañana o configura otra API key en el backend.",
+        "retries_exhausted": "El proveedor de IA no responde ahora mismo. Vuelve a intentarlo en unos minutos.",
+        "invalid_json": "El modelo ha devuelto una respuesta que no se ha podido interpretar. Inténtalo de nuevo.",
+        "invalid_plan": "No se ha podido analizar tu descripción. Revisa el texto e inténtalo de nuevo.",
+        "no_specs": "No se han generado módulos a partir de tu descripción. Añade más detalles y prueba otra vez.",
+        "empty_prompt": "Introduce una descripción antes de generar el código.",
+        "auth_error": "Falta la API key o no es válida para este proveedor. Configúrala en el archivo .env del backend.",
+        "model_not_found": "El modelo seleccionado no existe o no está disponible en este proveedor.",
+        "context_window": "El contenido supera el límite de contexto del modelo. Simplifica la descripción o usa un modelo con más contexto.",
+        "bad_request": "El proveedor ha rechazado la solicitud. Prueba con otro modelo o revisa la descripción.",
+        "provider_error": "El proveedor de IA ha devuelto un error. Inténtalo de nuevo o prueba con otro modelo.",
+        "unexpected": "Se ha producido un error inesperado en el backend. Revisa sus logs para más detalles."
+      }
     }
   },
   "settings": {

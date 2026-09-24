@@ -2,12 +2,13 @@ const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '
 const REQUEST_TIMEOUT_MS = 600_000 // 10 minutos (modelos locales lentos)
 
 export class ApiError extends Error {
-  constructor(message, { code = 'http', status = 0, detail = '' } = {}) {
+  constructor(message, { code = 'http', status = 0, detail = '', serverCode = '' } = {}) {
     super(message)
     this.name = 'ApiError'
     this.code = code
     this.status = status
     this.detail = detail
+    this.serverCode = serverCode
   }
 }
 
@@ -41,12 +42,16 @@ export async function generateCode({ prompt, model }) {
 
   if (!response.ok) {
     let detail = ''
+    let serverCode = ''
     try {
       const body = await response.json()
       if (typeof body.detail === 'string') {
         detail = body.detail
       } else if (body.detail) {
         detail = JSON.stringify(body.detail)
+      }
+      if (typeof body.code === 'string') {
+        serverCode = body.code
       }
     } catch {
       /* respuesta sin cuerpo JSON */
@@ -55,6 +60,7 @@ export async function generateCode({ prompt, model }) {
       code: 'http',
       status: response.status,
       detail,
+      serverCode,
     })
   }
 

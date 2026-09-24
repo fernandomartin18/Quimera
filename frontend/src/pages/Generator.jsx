@@ -101,15 +101,18 @@ export default function Generator() {
 
   const modelSelectId = 'ai-model'
 
+  const phrases = t('generator.welcome.phrases', { returnObjects: true })
+  const phraseList = Array.isArray(phrases) ? phrases : []
+  const [phraseIndex] = useState(() =>
+    phraseList.length > 0 ? Math.floor(Math.random() * phraseList.length) : 0,
+  )
+  const welcomePhrase = phraseList[phraseIndex] ?? t('generator.welcome.title')
+
   return (
     <section className="page generator-page">
-      <header className="page-header">
-        <span className="page-header__eyebrow">
-          <SparklesIcon size={13} />
-          {t('app.name')}
-        </span>
-        <h1>{t('generator.title')}</h1>
-        <p>{t('generator.subtitle')}</p>
+      <header className="welcome-header">
+        <h1>{t('generator.welcome.title')}</h1>
+        <p>{welcomePhrase}</p>
       </header>
 
       <form className="card prompt-card" onSubmit={handleSubmit} noValidate>

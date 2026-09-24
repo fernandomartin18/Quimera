@@ -4,25 +4,43 @@
     "tagline": "Código híbrido con IA multiagente"
   },
   "nav": {
-    "generator": "Generador",
     "settings": "Ajustes",
     "openSettings": "Abrir ajustes",
-    "home": "Volver al generador",
-    "cycleTheme": "Cambiar tema (claro / oscuro / automático)"
+    "home": "Volver al generador"
+  },
+  "sidebar": {
+    "collapse": "Comprimir barra lateral",
+    "expand": "Expandir barra lateral",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "history": {
+      "title": "Historial",
+      "empty": "Aún no hay sesiones. El historial estará disponible próximamente."
+    }
   },
   "language": {
-    "system": "Automático (Sistema)",
+    "system": "Automático",
     "es": "Español",
     "en": "English"
   },
   "theme": {
-    "system": "Automático (Sistema)",
+    "system": "Automático",
     "light": "Claro",
     "dark": "Oscuro"
   },
   "generator": {
-    "title": "Generador de código híbrido",
-    "subtitle": "Describe el problema en lenguaje natural y el sistema multiagente analizará el requerimiento para generar los módulos clásicos y cuánticos de la solución.",
+    "welcome": {
+      "title": "Bienvenido",
+      "phrases": [
+        "¿Qué quieres generar hoy?",
+        "¿Qué problema vamos a resolver?",
+        "Describe tu idea y dame el código.",
+        "¿Listo para crear algo híbrido?",
+        "Cuéntame qué necesitas construir.",
+        "De la mente mitológica al código: ¿empezamos?",
+        "Clásico, cuántico o ambos: tú decides."
+      ]
+    },
     "prompt": {
       "label": "Descripción del problema",
       "placeholder": "Ej.: Implementa un solver que combine una heurística clásica de poda con un circuito cuántico de Grover para buscar soluciones en un grafo no dirigido…",
@@ -80,11 +98,11 @@
   },
   "settings": {
     "title": "Ajustes",
-    "subtitle": "Preferencias de la aplicación. Los cambios se guardan automáticamente en este navegador.",
+    "back": "Volver",
     "comingSoon": "Próximamente",
     "sections": {
       "preferences": "Preferencias",
-      "providers": "Proveedores de IA",
+      "providers": "API Keys",
       "profile": "Perfil"
     },
     "preferences": {
@@ -92,13 +110,11 @@
       "description": "Idioma y tema de la interfaz de Quimera.",
       "language": {
         "label": "Idioma",
-        "description": "Idioma de la interfaz. Con «Automático» se detecta el idioma del navegador.",
-        "detected": "En uso ahora: {{value}}"
+        "description": "Idioma de la interfaz. Con «Automático» se detecta el idioma del navegador."
       },
       "theme": {
         "label": "Tema",
-        "description": "Apariencia clara u oscura. Con «Automático» se respeta la preferencia del sistema.",
-        "detected": "En uso ahora: {{value}}"
+        "description": "Apariencia clara u oscura. Con «Automático» se respeta la preferencia del sistema."
       }
     },
     "placeholder": {

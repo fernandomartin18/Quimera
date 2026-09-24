@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import PreferencesSection from '../components/settings/PreferencesSection.jsx'
-import { LayersIcon } from '../components/Icons.jsx'
+import { ArrowLeftIcon, LayersIcon } from '../components/Icons.jsx'
 import '../css/Settings.css'
 
 /**
@@ -34,49 +35,60 @@ function SectionPlaceholder({ title, description }) {
 
 export default function Settings() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
   const [activeId, setActiveId] = useState(
     SETTINGS_SECTIONS.find((section) => section.enabled)?.id ?? SETTINGS_SECTIONS[0].id,
   )
 
   const ActiveSection = SECTION_COMPONENTS[activeId]
 
+  const handleBack = () => {
+    if (location.key !== 'default') {
+      navigate(-1)
+    } else {
+      navigate('/')
+    }
+  }
+
   return (
     <section className="page settings-page">
-      <header className="page-header">
-        <span className="page-header__eyebrow">{t('app.name')}</span>
-        <h1>{t('settings.title')}</h1>
-        <p>{t('settings.subtitle')}</p>
-      </header>
+      <button type="button" className="btn btn--ghost btn--back" onClick={handleBack}>
+        <ArrowLeftIcon size={15} />
+        {t('settings.back')}
+      </button>
 
-      <div className="settings-layout">
-        <nav className="settings-nav" aria-label={t('settings.title')}>
+      <header className="settings-page__header">
+        <h1>{t('settings.title')}</h1>
+        <div className="settings-tabs" role="tablist" aria-label={t('settings.title')}>
           {SETTINGS_SECTIONS.map((section) => (
             <button
               key={section.id}
               type="button"
-              className={`settings-nav__item${activeId === section.id ? ' is-active' : ''}`}
+              role="tab"
+              className={`settings-tab${activeId === section.id ? ' is-active' : ''}`}
+              aria-selected={activeId === section.id}
               onClick={() => section.enabled && setActiveId(section.id)}
               disabled={!section.enabled}
-              aria-current={activeId === section.id ? 'page' : undefined}
             >
               <span>{t(section.labelKey)}</span>
               {!section.enabled && (
-                <span className="settings-nav__badge">{t('settings.comingSoon')}</span>
+                <span className="settings-tab__badge">{t('settings.comingSoon')}</span>
               )}
             </button>
           ))}
-        </nav>
-
-        <div className="card settings-panel">
-          {ActiveSection ? (
-            <ActiveSection />
-          ) : (
-            <SectionPlaceholder
-              title={t('settings.placeholder.title')}
-              description={t('settings.placeholder.description')}
-            />
-          )}
         </div>
+      </header>
+
+      <div className="card settings-panel">
+        {ActiveSection ? (
+          <ActiveSection />
+        ) : (
+          <SectionPlaceholder
+            title={t('settings.placeholder.title')}
+            description={t('settings.placeholder.description')}
+          />
+        )}
       </div>
     </section>
   )

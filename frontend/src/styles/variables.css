@@ -1,6 +1,7 @@
 /* ==========================================================================
    Quimera · Design tokens (globales)
    Temas claro/oscuro mediante [data-theme] en <html>.
+   Paleta «Oro ámbar» — evocación mitológica.
    ========================================================================== */
 
 :root {
@@ -17,7 +18,8 @@
   --radius-pill: 999px;
 
   /* Layout */
-  --header-height: 60px;
+  --sidebar-width: 264px;
+  --sidebar-width-collapsed: 68px;
   --content-width: 1180px;
 
   /* Movimiento */
@@ -31,22 +33,22 @@
 [data-theme='light'] {
   color-scheme: light;
 
-  --bg: #f4f6f9;
-  --bg-accent: rgba(99, 91, 255, 0.06);
-  --surface: #ffffff;
-  --surface-2: #f1f3f7;
-  --surface-3: #e7eaf0;
-  --border: #e2e6ee;
-  --border-strong: #c9d0dd;
+  --bg: #faf6ee;
+  --bg-accent: rgba(212, 156, 46, 0.1);
+  --surface: #fffdf8;
+  --surface-2: #f5efe2;
+  --surface-3: #ebe3d2;
+  --border: #e7ddc8;
+  --border-strong: #d2c4a6;
 
-  --text: #10141d;
-  --text-2: #4a5464;
-  --text-3: #727d92;
+  --text: #2a2115;
+  --text-2: #6b5c43;
+  --text-3: #7d6f56;
 
-  --accent: #635bff;
-  --accent-hover: #4f46e5;
+  --accent: #8a5f0f;
+  --accent-hover: #734f0b;
   --accent-contrast: #ffffff;
-  --accent-soft: rgba(99, 91, 255, 0.12);
+  --accent-soft: rgba(138, 95, 15, 0.14);
 
   --classic: #2563eb;
   --classic-soft: rgba(37, 99, 235, 0.12);
@@ -57,13 +59,15 @@
   --danger: #dc2626;
   --danger-soft: rgba(220, 38, 38, 0.1);
 
-  --focus-ring: 0 0 0 3px rgba(99, 91, 255, 0.32);
-  --overlay: rgba(16, 20, 28, 0.45);
-  --header-bg: rgba(255, 255, 255, 0.82);
+  --focus-ring: 0 0 0 3px rgba(138, 95, 15, 0.32);
+  --overlay: rgba(42, 33, 21, 0.45);
+  --sidebar-bg: rgba(255, 253, 248, 0.86);
 
-  --shadow-sm: 0 1px 2px rgba(16, 20, 28, 0.06);
-  --shadow-md: 0 4px 16px rgba(16, 20, 28, 0.08);
-  --shadow-lg: 0 16px 40px rgba(16, 20, 28, 0.12);
+  --brand-gradient: linear-gradient(135deg, #d9a13c, #8a5f0f);
+
+  --shadow-sm: 0 1px 2px rgba(42, 33, 21, 0.06);
+  --shadow-md: 0 4px 16px rgba(42, 33, 21, 0.08);
+  --shadow-lg: 0 16px 40px rgba(42, 33, 21, 0.12);
 }
 
 /* --------------------------------------------------------------------------
@@ -72,22 +76,22 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --bg: #0a0c11;
-  --bg-accent: rgba(124, 116, 255, 0.08);
-  --surface: #11141b;
-  --surface-2: #171b24;
-  --surface-3: #1f2430;
-  --border: #262c3a;
-  --border-strong: #3a4356;
+  --bg: #14110b;
+  --bg-accent: rgba(230, 170, 70, 0.08);
+  --surface: #1c1811;
+  --surface-2: #241f16;
+  --surface-3: #2e281c;
+  --border: #37301f;
+  --border-strong: #4f4530;
 
-  --text: #e7eaf3;
-  --text-2: #a2abbd;
-  --text-3: #77809a;
+  --text: #f2e9d6;
+  --text-2: #c7b695;
+  --text-3: #998a6c;
 
-  --accent: #7c74ff;
-  --accent-hover: #9a94ff;
-  --accent-contrast: #ffffff;
-  --accent-soft: rgba(124, 116, 255, 0.16);
+  --accent: #e6b34b;
+  --accent-hover: #f0c566;
+  --accent-contrast: #1d1709;
+  --accent-soft: rgba(230, 179, 75, 0.16);
 
   --classic: #60a5fa;
   --classic-soft: rgba(96, 165, 250, 0.14);
@@ -98,9 +102,11 @@
   --danger: #f87171;
   --danger-soft: rgba(248, 113, 113, 0.14);
 
-  --focus-ring: 0 0 0 3px rgba(124, 116, 255, 0.4);
+  --focus-ring: 0 0 0 3px rgba(230, 179, 75, 0.4);
   --overlay: rgba(0, 0, 0, 0.6);
-  --header-bg: rgba(10, 12, 17, 0.8);
+  --sidebar-bg: rgba(20, 17, 11, 0.85);
+
+  --brand-gradient: linear-gradient(135deg, #f0c566, #b8860b);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);

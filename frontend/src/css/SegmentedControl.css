@@ -1,6 +1,6 @@
 .segmented {
-  display: inline-flex;
-  flex-wrap: wrap;
+  display: flex;
+  width: min(370px, 100%);
   gap: 4px;
   padding: 4px;
   background: var(--surface-2);
@@ -9,23 +9,33 @@
 }
 
 .segmented__option {
+  flex: 1 1 0;
+  min-width: 0;
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 7px;
-  padding: 8px 13px;
+  justify-content: center;
+  gap: 4px 7px;
+  padding: 8px 8px;
   border: 1px solid transparent;
   border-radius: 9px;
   background: transparent;
   color: var(--text-2);
   font-size: 13.5px;
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: break-word;
   cursor: pointer;
   transition:
     background-color var(--transition),
     border-color var(--transition),
     color var(--transition),
     box-shadow var(--transition);
+}
+
+.segmented__option > span:not(.segmented__badge) {
+  min-width: 0;
 }
 
 .segmented__option:hover:not(.is-active) {
@@ -66,4 +76,23 @@
   background: var(--accent-soft);
   border-color: transparent;
   color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .segmented {
+    width: 100%;
+  }
+
+  .segmented__option {
+    font-size: 13px;
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 950px) {
+  .segmented__option {
+    font-size: 12px;
+    gap: 3px;
+    padding: 8px 4px;
+  }
 }

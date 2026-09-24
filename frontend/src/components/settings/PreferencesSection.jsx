@@ -6,8 +6,7 @@ import { usePreferences } from '../../context/preferencesContext.js'
 
 export default function PreferencesSection() {
   const { t } = useTranslation()
-  const { preferences, resolvedLanguage, resolvedTheme, setLanguage, setTheme } =
-    usePreferences()
+  const { preferences, setLanguage, setTheme } = usePreferences()
 
   const languageOptions = [
     {
@@ -56,11 +55,6 @@ export default function PreferencesSection() {
         <div className="preference-row__info">
           <h3>{t('settings.preferences.language.label')}</h3>
           <p>{t('settings.preferences.language.description')}</p>
-          <span className="preference-row__detected">
-            {t('settings.preferences.language.detected', {
-              value: t(`language.${resolvedLanguage}`),
-            })}
-          </span>
         </div>
         <SegmentedControl
           label={t('settings.preferences.language.label')}
@@ -74,11 +68,6 @@ export default function PreferencesSection() {
         <div className="preference-row__info">
           <h3>{t('settings.preferences.theme.label')}</h3>
           <p>{t('settings.preferences.theme.description')}</p>
-          <span className="preference-row__detected">
-            {t('settings.preferences.theme.detected', {
-              value: t(`theme.${resolvedTheme}`),
-            })}
-          </span>
         </div>
         <SegmentedControl
           label={t('settings.preferences.theme.label')}

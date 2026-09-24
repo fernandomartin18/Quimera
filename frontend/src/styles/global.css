@@ -25,7 +25,8 @@ body {
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -10%, var(--bg-accent), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, var(--bg-accent), transparent);
+    radial-gradient(ellipse 60% 40% at 100% 0%, var(--bg-accent), transparent),
+    radial-gradient(ellipse 50% 40% at 0% 100%, var(--bg-accent), transparent);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -115,6 +116,12 @@ p {
 .app-shell {
   min-height: 100dvh;
   display: flex;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
 }
 
@@ -124,35 +131,6 @@ p {
   max-width: var(--content-width);
   margin-inline: auto;
   padding: 32px 24px 72px;
-}
-
-.page-header {
-  margin-bottom: 24px;
-}
-
-.page-header__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-
-.page-header h1 {
-  font-size: clamp(24px, 3.2vw, 32px);
-  letter-spacing: -0.025em;
-}
-
-.page-header p {
-  margin-top: 10px;
-  max-width: 72ch;
-  color: var(--text-2);
-  line-height: 1.6;
-  font-size: 15px;
 }
 
 /* --------------------------------------------------------------------------
@@ -229,6 +207,11 @@ p {
   color: var(--text-2);
 }
 
+.btn--back {
+  padding: 8px 14px 8px 10px;
+  margin-bottom: 14px;
+}
+
 .btn--ghost:hover:not(:disabled) {
   background: var(--surface-2);
   border-color: var(--border-strong);
@@ -239,6 +222,31 @@ p {
   padding: 13px 22px;
   font-size: 15px;
   border-radius: 12px;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.icon-btn:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  color: var(--text);
+  text-decoration: none;
 }
 
 /* --------------------------------------------------------------------------

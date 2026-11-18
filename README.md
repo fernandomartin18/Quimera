@@ -473,4 +473,4 @@ Quimera/
 - Orquestación con LangGraph / CrewAI
 - Parseo estructurado con re-intento del plan del Arquitecto
 - Secciones de Ajustes: Proveedores/API keys y Perfil
-- Tests automatizados (backend y frontend)
+- Tests automatizados (backend y frontend).
